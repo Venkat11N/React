@@ -1,111 +1,184 @@
 import React from "react"
+import ClaudeRecipe from "./Components/ClaudeRecipe"
+import IngredientsList from "./Components/IngredientsList"
+import { getRecipeFromMistral } from "./ai.js";
+
 
 export default function Main() {
+  const [ingredients, setIngredients] = React.useState([])
 
-    const [ingredients, setIngredients] = React.useState(
-      ["all the main spices", "pasta", "ground beef", "tomato paste"]
-    )
+  const [recipeShown, setRecipeShown] = React.useState(false)
+  const [ recipeMarkdown, setRecipeMarkdown] = React.useState("") 
 
-        /**
-     * Challenge:
-     * 1. Create a boolean state that, for now, will represent whether
-     *    we've gotten a recipe back from the "chef". Default to `false`.
-     *    Can call it `recipeShown`.
-     * 2. Grab the markup in recipeCode.md and paste it below. This will
-     *    be a placeholder for the content that will come back from the 
-     *    chef once we set up that feature.
-     * 3. When the user clicks the "Get a recipe" button, flip the
-     *    `recipeShown` state to true.
-     * 4. Only display the recipe code content if `recipeShown` is true.
-     */
+  async function getRecipe() {
+    const recipeMarkdown = await getRecipeFromMistral(ingredients)
+    setRecipeMarkdown(recipeMarkdown) 
+    setRecipeShown(true) 
+  }
 
-     const [recipeShown, setRecipeShown] = React.useState(false)
-     
-     function toggleRecipeShown() {
-        setRecipeShown(prevRecipeShown => !prevRecipeShown)
-     }
-
-    const ingredientsListItems = ingredients.map(ingredient => (
-        <li key={ingredient}>{ingredient}</li>
-    ))
-
-    function addIngredient(formData) {
-        const newIngredient = formData.get("ingredient")
-        setIngredients(prevIngredients => [...prevIngredients, newIngredient])
+  function addIngredient(formData) {
+    const newIngredient = formData.get("ingredient")
+    if (newIngredient.trim() !== "") {
+      setIngredients(prev => [...prev, newIngredient])
     }
+  }
 
-        /**
-     * Challenge:
-     * Only display the div.get-recipe-container if the ingredients list
-     * has more than 3 items in it. (Fewer than that and it might not
-     * give great results from the chef 🤖👩‍🍳)
-     */
+  return (
+    <main>
+      <form action={addIngredient} className="add-ingredient-form">
+        <input
+          type="text"
+          placeholder="e.g. oregano"
+          aria-label="Add ingredient"
+          name="ingredient"
+        />
+        <button>Add ingredient</button>
+      </form>
+
+      {ingredients.length > 0 && (
+        <IngredientsList ingredients={ingredients} getRecipe={getRecipe} />
+      )}
+
+      {recipeShown && <ClaudeRecipe recipe={recipeMarkdown} />}
+    </main>
+  )
+}
+
+
+
+
+
+
+// import React from "react"
+// import ClaudeRecipe from "./Components/ClaudeRecipe"
+// import IngredientsList from "./Components/IngredientsList"
+// import { getRecipeFromMistral } from "./ai"
+
+
+// /**
+//  * Challenge: Get a recipe from the AI!  
+//  * 
+//  * This will be a bit harder of a challenge that will require you
+//  * to think critically and synthesize the skills you've been
+//  * learning and practicing up to this point.
+//  * 
+//  * We'll start with a mini-quiz:
+//  * 
+//  * 1. Think about where the recipe response should live and how you're
+//  *    going to make sure it doesn't disappear between each state change in
+//  *    the app. (I don't mean between refreshes of your mini-browser.
+//  *    You don't need to save this to localStorage or anything more permanent
+//  *    than in React's memory for now.)
+//  *  
+//  * I'm going to save the response in React state.
+//  * 
+//  * 2. What action from the user should trigger getting the recipe?
+//  * 
+//  * when the user clicks the get a recipe button.
+//  */
+
+// export default function Main() {
+
+
+//     /**
+//  * Challenge: Get a recipe from the AI!
+//  * 
+//  * This will be a bit harder of a challenge that will require you
+//  * to think critically and synthesize the skills you've been
+//  * learning and practicing up to this point.
+//  * 
+//  * Using either the `getRecipeFromChefClaude` function or the 
+//  * `getRecipeFromMistral` function, make it so that when the user
+//  * clicks "Get a recipe", the text response from the AI is displayed
+//  * in the <ClaudeRecipe> component.
+//  * 
+//  * For now, just have it render the raw markdown that the AI returns,
+//  * don't worry about making it look nice yet. (We're going to use a
+//  * package that will render the markdown for us soon.)
+//  */
+
+//         /**
+//      * Challenge: clean up our code!
+//      * Let's make a couple new components to make things a
+//      * little cleaner. (Notice: I'm not suggesting what we
+//      * have now is bad or wrong. I'm mostly finding an excuse
+//      * to get in some hands-on practice 🙂)
+//      * 
+//      * 1. Move the entire recipe <section> into its own
+//      *    ClaudeRecipe component
+//      * 2. Move the list of ingredients <section> into its
+//      *    own IngredientsList component.
+//      * 
+//      * While you're considering how to structure things, consider
+//      * where state is, think about if it makes sense or not to
+//      * move it somewhere else, how you'll communicate between
+//      * the parent/child components, etc.
+//      * 
+//      * The app should function as it currently does when you're
+//      * done, so there will likely be some extra work to be done
+//      * beyond what I've listed above.
+//      */
+
+//     const [ingredients, setIngredients] = React.useState(
+//       ["all the main spices", "pasta", "ground beef", "tomato paste"]
+//     )
+
+//         /**
+//      * Challenge:
+//      * 1. Create a boolean state that, for now, will represent whether
+//      *    we've gotten a recipe back from the "chef". Default to `false`.
+//      *    Can call it `recipeShown`.
+//      * 2. Grab the markup in recipeCode.md and paste it below. This will
+//      *    be a placeholder for the content that will come back from the 
+//      *    chef once we set up that feature.
+//      * 3. When the user clicks the "Get a recipe" button, flip the
+//      *    `recipeShown` state to true.
+//      * 4. Only display the recipe code content if `recipeShown` is true.
+//      */
+
+//      const [recipeShown, setRecipeShown] = React.useState(false)
+     
+//     async function getRecipe() {
+//        const recipeMarkdown = await getRecipeFromMistral(ingredients)
+//        console.log(recipeMarkdown)
+//      } 
+
+//     function addIngredient(formData) {
+//         const newIngredient = formData.get("ingredient")
+//         setIngredients(prevIngredients => [...prevIngredients, newIngredient])
+//     }
+
+//         /**
+//      * Challenge:
+//      * Only display the div.get-recipe-container if the ingredients list
+//      * has more than 3 items in it. (Fewer than that and it might not
+//      * give great results from the chef 🤖👩‍🍳)
+//      */
     
 
 
-    /**
-     * Challenge:
-     * Using conditional rendering, only render the new <section> IF
-     * there are ingredients added to the list of ingredients.
-     */
+//     /**
+//      * Challenge:
+//      * Using conditional rendering, only render the new <section> IF
+//      * there are ingredients added to the list of ingredients.
+//      */
 
-    return (
-        <main>
-            <form action={addIngredient} className="add-ingredient-form">
-                <input
-                    type="text"
-                    placeholder="e.g. oregano"
-                    aria-label="Add ingredient"
-                    name="ingredient"
-                />
-                <button>Add ingredient</button>
-            </form>
-            {ingredients.length > 0 && <section>
-                <h2>Ingredients on hand:</h2>
-                <ul className="ingredients-list" aria-live="polite">{ingredientsListItems}</ul>
-                {ingredients.length > 3 && <div className="get-recipe-container">
-                    <div>
-                        <h3>Ready for a recipe?</h3>
-                        <p>Generate a recipe from your list of ingredients.</p>
-                    </div>
-                    <button onClick={toggleRecipeShown} >Get a recipe</button>
-                </div>}
-            </section>}
-              {recipeShown && <section>
-              <h2>Chef Claude Recommends:</h2>
-              <article className="suggested-recipe-container" aria-live="polite">
-                  <p>Based on the ingredients you have available, I would recommend making a simple a delicious <strong>Beef Bolognese Pasta</strong>. Here is the recipe:</p>
-                  <h3>Beef Bolognese Pasta</h3>
-                  <strong>Ingredients:</strong>
-                  <ul>
-                      <li>1 lb. ground beef</li>
-                      <li>1 onion, diced</li>
-                      <li>3 cloves garlic, minced</li>
-                      <li>2 tablespoons tomato paste</li>
-                      <li>1 (28 oz) can crushed tomatoes</li>
-                      <li>1 cup beef broth</li>
-                      <li>1 teaspoon dried oregano</li>
-                      <li>1 teaspoon dried basil</li>
-                      <li>Salt and pepper to taste</li>
-                      <li>8 oz pasta of your choice (e.g., spaghetti, penne, or linguine)</li>
-                  </ul>
-                  <strong>Instructions:</strong>
-                  <ol>
-                      <li>Bring a large pot of salted water to a boil for the pasta.</li>
-                      <li>In a large skillet or Dutch oven, cook the ground beef over medium-high heat, breaking it up with a wooden spoon, until browned and cooked through, about 5-7 minutes.</li>
-                      <li>Add the diced onion and minced garlic to the skillet and cook for 2-3 minutes, until the onion is translucent.</li>
-                      <li>Stir in the tomato paste and cook for 1 minute.</li>
-                      <li>Add the crushed tomatoes, beef broth, oregano, and basil. Season with salt and pepper to taste.</li>
-                      <li>Reduce the heat to low and let the sauce simmer for 15-20 minutes, stirring occasionally, to allow the flavors to meld.</li>
-                      <li>While the sauce is simmering, cook the pasta according to the package instructions. Drain the pasta and return it to the pot.</li>
-                      <li>Add the Bolognese sauce to the cooked pasta and toss to combine.</li>
-                      <li>Serve hot, garnished with additional fresh basil or grated Parmesan cheese if desired.</li>
-                  </ol>
-              </article>
-          </section>}
-        </main>
-    )
-}
+//     return (
+//         <main>
+//             <form action={addIngredient} className="add-ingredient-form">
+//                 <input
+//                     type="text"
+//                     placeholder="e.g. oregano"
+//                     aria-label="Add ingredient"
+//                     name="ingredient"
+//                 />
+//                 <button>Add ingredient</button>
+//             </form>
+//         {ingredients.length > 0 && <IngredientsList ingredients={ingredients} getRecipe={getRecipe}/>}
+//             {recipeShown && <ClaudeRecipe />}
+//         </main>
+//     )
+// }
 
 
 
